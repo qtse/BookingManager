@@ -1,37 +1,104 @@
-/* Makeshift CSS Reset */
-{
-  margin: 0;
-  padding: 0;
-}
-
-/* Display HTML5 elements as block */
-header, footer, nav, article, section {
+header,footer,
+/*article,*/section,
+hgroup,nav/*,
+figure*/ {
+  /* Giving a display value to the HTML5 rendered elements: */
   display: block;
 }
 
-body {
-  margin: 0 auto;
-  font-family: Helvetica, Arial, sans-serif;
+nav {
+  background: 50% 50% #f8f8f8;
+  position: absolute; 
+  right: 0;
+  top: 1em;
+  border: 1px solid #FCFCFC;
+  border-radius: 25px;
+  box-shadow: 0 1px 1px #333333;
 }
 
-p {
-  padding-bottom: 22px;
+nav ul li{
+  display: inline;
+  padding: 2px;
 }
 
-#bookingList {
+nav ul li a,
+nav ul li a:visited {
+  color: #565656;
+  display: block;
+  float: left;
+  font-weight: bold;
+  margin: 4px;
+  padding: 4px;
+  text-shadow: 0 1px 1px white;
+  text-transform: uppercase;
+}
+
+nav ul li a:hover {
+  text-decoration: none;
+  background-color: #e0e0e0;
+}
+
+/* Article styles: */
+#page {
   width: 100%;
+  margin: 0 auto;
+  position: relative;
 }
 
-#content {
-  display: table;
+tbody tr:nth-child(odd) {
+  background-color: #eee;
 }
-#left {
-  display: table-cell;
+
+#listing caption {
+  text-align: left;
+  font-weight: bold;
+}
+
+#listing {
   width: 60%;
-  padding: 5px;
+  float: left;
 }
-#right {
-  display: table-cell;
+
+#details {
   width: 40%;
-  padding: 5px;
+  float: left;
 }
+
+#bookingList tbody tr:hover {
+  background-color: #ddd;
+}
+
+/* Footer styling: */
+footer {
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 0.825em;
+}
+ 
+footer p {
+  margin-bottom: -2.5em;
+  position: relative;
+}
+ 
+footer a,footer a:visited {
+  color: #cccccc;
+  background-color: #213e4a;
+  display: block;
+  padding: 2px 4px;
+  z-index: 100;
+  position: relative;
+}
+ 
+footer a:hover {
+  text-decoration: none;
+  background-color: #142830;
+}
+ 
+footer a.by {
+  float: left;
+}
+ 
+footer a.up {
+  float: right;
+}
+
