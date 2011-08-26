@@ -22,7 +22,8 @@ import sys
 ###from google.appengine.dist import use_library
 ###use_library('django', '1.2')
 
-sys.path.insert(0, 'simplejsob.zip')
+sys.path.insert(0, 'pytz.zip')
+sys.path.insert(0, 'simplejson.zip')
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
