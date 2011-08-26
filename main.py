@@ -16,29 +16,26 @@
 #
 import os
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+###os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
-from google.appengine.dist import use_library
-use_library('django', '1.2')
+###from google.appengine.dist import use_library
+###use_library('django', '1.2')
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
 from google.appengine.ext.webapp import util
 
-from pytz.gae import pytz
-from pytz import timezone
+###from pytz.gae import pytz
+###from pytz import timezone
 from datetime import datetime
 
-from models.ds import *
+from views import views
+from views import jsonfmt as fmt
+import simplejson as json
 
 class MainHandler(webapp.RequestHandler):
   def get(self):
-    template_values = {
-        '': None,
-    }
-
-    path = os.path.join(os.path.dirname(__file__), 'templates/index.html')
-    self.response.out.write(template.render(path, template_values))
+    self.response.out.write(json.dumps(views.get_current_courses(), default=fmt.json_handler))
 
 def main():
   application = webapp.WSGIApplication([('/', MainHandler),
