@@ -15,11 +15,14 @@
 # limitations under the License.
 #
 import os
+import sys
 
 ###os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 ###from google.appengine.dist import use_library
 ###use_library('django', '1.2')
+
+sys.path.insert(0, 'simplejsob.zip')
 
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp import template
