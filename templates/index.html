@@ -86,15 +86,52 @@
     <section id="details">
       <section id="editForm">
         <form>
-          <label>Booking Reference</label>
-          <label>Company</label>
-          <label>Course</label>
-          <label>Status</label>
-          <label>Fare</label>
-          <label>Paid by</label>
-          <label>Credit</label>
-          <label>Credit Expiry</label>
-          <button type="submit">Submit</button>
+          <div>
+            <label>Booking Reference</label>: 
+            <input autocomplete="false" type="text" name="ref"></input>
+          </div>
+          <div>
+            <label>Company</label>: 
+            <input autocomplete="true" list="company_list" type="text" name="company"></input>
+            <datalist id="company_list">
+              <option label="CountryLink" value="CountryLink" />
+              <option label="Greyhound" value="Greyhound" />
+              <option label="Greyhound Charters" value="Greyhound Charters" />
+              <option label="Qantas" value="Qantas" />
+            </datalist>
+          </div>
+          <div>
+            <label>Course</label>: 
+            <input autocomplete="true" type="text" name="course"></input>
+          </div>
+          <div>
+            <label>Status</label>: 
+            <select name="status">
+              <option value="unpaid" selected="true">UNPAID</option>
+              <option value="paid">PAID</option>
+              <option value="credit">CREDIT</option>
+              <option value="cancel">CANCELLED</option>
+            </select>
+          </div>
+          <div>
+            <label>Fare</label>: 
+            <input autocomplete="false" type="number" name="fare"></input>
+          </div>
+          <div>
+            <label>Paid by</label>: 
+            <input autocomplete="false" type="date" name="paid_by"></input>
+          </div>
+          <div>
+            <label>Credit</label>: 
+            <input autocomplete="false" type="number" name="credit"></input>
+          </div>
+          <div>
+            <label>Credit Expiry</label>: 
+            <input autocomplete="false" type="date" name="credit_expiry"></input>
+          </div>
+          <div>
+            <input type="submit">Submit</button>
+          </div>
         </form>
       </section>
       <details id="sectors">
