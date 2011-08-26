@@ -20,7 +20,7 @@ def _use(obj_key):
   u = LastUse.get_or_insert(key_str, obj=obj_key)
   if now > u.last_use:
     u.last_use = now
-    u.put_async()
+    db.put_async(u)
 
 # get functions
 
@@ -71,7 +71,7 @@ def get_bookings_by_booking_ref(booking_ref, company=None, active_only=False):
     q.filter('company = ', company)
 
   if active_only:
-    q.filter("last_date <= ", datetime.now(timezone('Australia/Sydney')).date() - _active_period)
+    q.filter("last_date >= ", _current_date() - _active_period)
 
   return [b.to_dict() for b in q]
 
