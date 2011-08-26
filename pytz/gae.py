@@ -40,7 +40,8 @@ class memcache(object):
         return None
 
 try:
-    if os.environ.get('SERVER_SOFTWARE', '').startswith('Development'):
+    # Don't use memcache outside of Google App Engine or with GAE's dev server.
+    if not os.environ.get('SERVER_SOFTWARE', '').startswith('Development'):
         from google.appengine.api import memcache
 except ImportError:
     pass
