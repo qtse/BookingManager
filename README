@@ -1,5 +1,6 @@
 ...
 
+Requires GAE 1.5.3+
 
 Uses the following libraries:
 SimpleJson 2.0.9
