@@ -329,3 +329,7 @@ def remove_pax_from_booking(booking_id, service_no):
   _use(p)
   _use(b)
   db.delete(psb)
+
+def delete_document_by_id(doc_id):
+  d = db.Key.from_path('Document', doc_id)
+  db.delete(d)
