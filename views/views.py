@@ -195,18 +195,20 @@ def add_passenger_to_sector(sector_id, service_no, last_name=None, init=None, fa
   s = Sector.get_by_id(sector_id)
   p = Passenger.get_by_key_name(service_no)
 
-  if not p:
+  if not p and last_name and init:
     p = Passenger(service_no=service_no, key_name=service_no, last_name=last_name, init=init)
     p.put()
 
-  if s:
+  if p and s:
     psb = PassengerSectorBooking(passenger=p, sector=s, booking=s.booking, fare_type=fare, key_name=str(p.key())+str(s.key()))
     psb.put()
 
     _use(s.booking.key())
     _use(p.key())
 
-  return p.to_dict()
+    return p.to_dict()
+
+  return None
 
 # set/update functions
 def update_booking(booking_id, **kwds):
