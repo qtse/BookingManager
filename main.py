@@ -35,10 +35,7 @@ from datetime import datetime
 from views import views
 from views import jsonfmt as fmt
 import simplejson as json
-
-class MainHandler(webapp.RequestHandler):
-  def get(self):
-    self.response.out.write(json.dumps(views.get_current_courses(), default=fmt.json_handler))
+import dateutil.parser
 
 class JsonHandler(webapp.RequestHandler):
   def get(self, obj_type, arg=''):
@@ -103,10 +100,80 @@ class JsonHandler(webapp.RequestHandler):
 
     self.response.out.write(json.dumps(res, default=fmt.json_handler))
 
+class MainHandler(webapp.RequestHandler):
+  def get(self, obj_type, arg=''):
+    pass
+  def put(self, obj_type, arg=''):
+    pass
+  def post(self, obj_type, arg=''):
+    arg = arg.strip()
+    if len(arg) > 0 and arg[-1] == '/':
+      arg = arg[:-1]
+    args = arg.strip().split('/')
+    res = None
+
+    if obj_type == 'booking':
+      company = self.request.get('company', default_value=None)
+      booking_ref = self.request.get('booking_ref', default_value=None)
+      course = self.request.get('course', default_value=None)
+      fare = self.request.get('fare', default_value=None)
+      paid_by = self.request.get('paid_by', default_value=None)
+      state = self.request.get('status', default_value=None)
+      amount_in_credit = self.request.get('credit', default_value=None)
+      credit_expiry = self.request.get('credit_expiry', default_value=None)
+
+      kwds = {}
+      if fare and len(fare.strip()) > 0:
+        kwds['fare'] = float(fare)
+      if paid_by and len(paid_by.strip()) > 0:
+        kwds['paid_by'] = dateutil.parser.parse(paid_by).date()
+      if state and len(state.strip()) > 0:
+        kwds['state'] = state
+      if amount_in_credit and len(amount_in_credit.strip()) > 0:
+        kwds['amount_in_credit'] = float(amount_in_credit)
+      if credit_expiry and len(credit_expiry.strip()) > 0:
+        kwds['credit_expiry'] = dateutil.parser.parse(credit_expiry).date()
+
+      if company and booking_ref and course:
+        res = views.add_booking(company, booking_ref, course, **kwds)
+
+    elif obj_type == 'sector':
+      views.delete_sector_by_id(int(args[0]))
+    elif obj_type == 'pax':
+      if args[1] == 'sector':
+        views.remove_pax_from_sector(int(args[2]), args[0])
+      elif args[1] == 'booking':
+        views.remove_pax_from_booking(int(args[2], args[0]))
+    elif obj_type == 'doc':
+      views.delete_document_by_id(int(args[0]))
+    
+    self.response.out.write(json.dumps(res, default=fmt.json_handler))
+
+  def delete(self, obj_type, arg=''):
+    arg = arg.strip()
+    if len(arg) > 0 and arg[-1] == '/':
+      arg = arg[:-1]
+    args = arg.strip().split('/')
+    res = None
+
+    if obj_type == 'booking':
+      views.delete_booking_by_id(int(args[0]))
+    elif obj_type == 'sector':
+      views.delete_sector_by_id(int(args[0]))
+    elif obj_type == 'pax':
+      if args[1] == 'sector':
+        views.remove_pax_from_sector(int(args[2]), args[0])
+      elif args[1] == 'booking':
+        views.remove_pax_from_booking(int(args[2], args[0]))
+    elif obj_type == 'doc':
+      views.delete_document_by_id(int(args[0]))
+
 def main():
-  application = webapp.WSGIApplication([#('/', MainHandler),
+  application = webapp.WSGIApplication([
                                         (r'/json/(.*?)/(.*)', JsonHandler),
                                         (r'/json/(.*)', JsonHandler),
+                                        (r'/(.*?)/(.*)', MainHandler),
+                                        (r'/(.*)', MainHandler),
                                        ], debug=True)
   util.run_wsgi_app(application)
 
