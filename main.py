@@ -113,39 +113,67 @@ class MainHandler(webapp.RequestHandler):
     res = None
 
     if obj_type == 'booking':
-      company = self.request.get('company', default_value=None)
-      booking_ref = self.request.get('booking_ref', default_value=None)
-      course = self.request.get('course', default_value=None)
-      fare = self.request.get('fare', default_value=None)
-      paid_by = self.request.get('paid_by', default_value=None)
-      state = self.request.get('status', default_value=None)
-      amount_in_credit = self.request.get('credit', default_value=None)
-      credit_expiry = self.request.get('credit_expiry', default_value=None)
+      if len(args) == 0:
+        # /booking
+        # Create new booking
+        company = self.request.get('company', default_value=None)
+        booking_ref = self.request.get('booking_ref', default_value=None)
+        course = self.request.get('course', default_value=None)
+        fare = self.request.get('fare', default_value=None)
+        paid_by = self.request.get('paid_by', default_value=None)
+        state = self.request.get('status', default_value=None)
+        amount_in_credit = self.request.get('credit', default_value=None)
+        credit_expiry = self.request.get('credit_expiry', default_value=None)
 
-      kwds = {}
-      if fare and len(fare.strip()) > 0:
-        kwds['fare'] = float(fare)
-      if paid_by and len(paid_by.strip()) > 0:
-        kwds['paid_by'] = dateutil.parser.parse(paid_by).date()
-      if state and len(state.strip()) > 0:
-        kwds['state'] = state
-      if amount_in_credit and len(amount_in_credit.strip()) > 0:
-        kwds['amount_in_credit'] = float(amount_in_credit)
-      if credit_expiry and len(credit_expiry.strip()) > 0:
-        kwds['credit_expiry'] = dateutil.parser.parse(credit_expiry).date()
+        kwds = {}
+        if fare and len(fare.strip()) > 0:
+          kwds['fare'] = float(fare)
+        if paid_by and len(paid_by.strip()) > 0:
+          kwds['paid_by'] = dateutil.parser.parse(paid_by).date()
+        if state and len(state.strip()) > 0:
+          kwds['state'] = state
+        if amount_in_credit and len(amount_in_credit.strip()) > 0:
+          kwds['amount_in_credit'] = float(amount_in_credit)
+        if credit_expiry and len(credit_expiry.strip()) > 0:
+          kwds['credit_expiry'] = dateutil.parser.parse(credit_expiry).date()
 
-      if company and booking_ref and course:
-        res = views.add_booking(company, booking_ref, course, **kwds)
+        if company and booking_ref and course:
+          res = views.add_booking(company, booking_ref, course, **kwds)
+
+      elif args[2] == 'sector':
+        # /booking/<booking_id>/sector
+        # Add sector to booking
+        booking_id = int(args[0].strip())
+        date = self.request.get('date', default_value=None)
+        from_loc = self.request.get('from', default_value=None)
+        to_loc = self.request.get('to', default_value=None)
+        service = self.request.get('service', default_value=None)
+
+        kwds = {}
+        if date:
+          kwds['date'] = dateutil.parser.parse(date.strip())
+        if from_loc:
+          kwds['from_loc'] = from_loc.strip()
+        if to_loc:
+          kwds['to_loc'] = to_loc.strip()
+        if service:
+          lwds['service'] = service.strip()
+
+        if date and from_loc and to_loc and service:
+          res = views.add_sector(booking_id, **kwds)
 
     elif obj_type == 'sector':
-      views.delete_sector_by_id(int(args[0]))
-    elif obj_type == 'pax':
-      if args[1] == 'sector':
-        views.remove_pax_from_sector(int(args[2]), args[0])
-      elif args[1] == 'booking':
-        views.remove_pax_from_booking(int(args[2], args[0]))
-    elif obj_type == 'doc':
-      views.delete_document_by_id(int(args[0]))
+      if len(args) > 2 and args[1] == 'pax':
+        sector_id = int(args[0].strip())
+        sn = self.request.get('service_no', default_value=None)
+        last_name = self.request.get('last_name', default_value=None)
+        init = self.request.get('init', default_value=None)
+        fare = self.request.get('fare', default_value=None)
+
+        if last_name is None or len(last_name.strip()) == 0:
+          res = add_passenger_to_sector(sector_id, sn)
+        else:
+          res = add_passenger_to_sector(sector_id, sn, last_name, init, fare)
     
     self.response.out.write(json.dumps(res, default=fmt.json_handler))
 
