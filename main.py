@@ -104,7 +104,80 @@ class MainHandler(webapp.RequestHandler):
   def get(self, obj_type, arg=''):
     pass
   def put(self, obj_type, arg=''):
-    pass
+    arg = arg.strip()
+    if len(arg) > 0 and arg[-1] == '/':
+      arg = arg[:-1]
+    args = arg.strip().split('/')
+    obj_id = args[0]
+    res = None
+
+    if obj_type == 'booking':
+      if len(args) == 0:
+        # /booking/<id>
+        # Create new booking
+        company = self.request.get('company', default_value=None)
+        booking_ref = self.request.get('booking_ref', default_value=None)
+        course = self.request.get('course', default_value=None)
+        fare = self.request.get('fare', default_value=None)
+        paid_by = self.request.get('paid_by', default_value=None)
+        state = self.request.get('status', default_value=None)
+        amount_in_credit = self.request.get('credit', default_value=None)
+        credit_expiry = self.request.get('credit_expiry', default_value=None)
+
+        kwds = {}
+        if fare and len(fare.strip()) > 0:
+          kwds['fare'] = float(fare)
+        if paid_by and len(paid_by.strip()) > 0:
+          kwds['paid_by'] = dateutil.parser.parse(paid_by).date()
+        if state and len(state.strip()) > 0:
+          kwds['state'] = state
+        if amount_in_credit and len(amount_in_credit.strip()) > 0:
+          kwds['amount_in_credit'] = float(amount_in_credit)
+        if credit_expiry and len(credit_expiry.strip()) > 0:
+          kwds['credit_expiry'] = dateutil.parser.parse(credit_expiry).date()
+
+        if company and booking_ref and course:
+          res = views.update_booking(int(obj_id), **kwds)
+
+    elif obj_type == 'sector':
+      if len(args) == 1:
+        # /sector/<id>
+        # Update sector
+        date = self.request.get('date', default_value=None)
+        from_loc = self.request.get('from', default_value=None)
+        to_loc = self.request.get('to', default_value=None)
+        service = self.request.get('service', default_value=None)
+
+        kwds = {}
+        if date:
+          kwds['date'] = dateutil.parser.parse(date.strip())
+        if from_loc:
+          kwds['from_loc'] = from_loc.strip()
+        if to_loc:
+          kwds['to_loc'] = to_loc.strip()
+        if service:
+          lwds['service'] = service.strip()
+
+        if date and from_loc and to_loc and service:
+          res = views.update_sector(int(obj_id), **kwds)
+      elif len(args) == 3 and args[1] == 'pax':
+        # /sector/<id>/pax/<service_no>
+        # Update fare
+        sn = args[2]
+        fare = self.request.get('fare', default_value=None)
+        res = update_passenger_fare(sn, int(obj_id), fare)
+
+    elif obj_type == 'pax':
+      # /pax/<service_no>
+      # Update passenger
+      kwds = {}
+      kwds['last_name'] = self.request.get('last_name', default_value=None)
+      kwds['init'] = self.request.get('init', default_value=None)
+
+      res = update_passenger(obj_id, **kwds)
+    
+    self.response.out.write(json.dumps(res, default=fmt.json_handler))
+
   def post(self, obj_type, arg=''):
     arg = arg.strip()
     if len(arg) > 0 and arg[-1] == '/':
