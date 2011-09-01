@@ -48,9 +48,9 @@ class MainHandler(webapp.RequestHandler):
     res = None
 
     if obj_type == 'booking':
-      if len(args) > 1:
-        if args[0] == 'id':
-          res = views.get_booking_by_id(int(args[1]))
+      if len(args) == 1:
+        res = views.get_booking_by_id(int(args[0]))
+      elif len(args) > 1:
         elif args[0] == 'ref':
           ref = args[1]
           company = None
