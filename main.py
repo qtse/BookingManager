@@ -35,7 +35,9 @@ from datetime import datetime
 from views import views
 from views import jsonfmt as fmt
 import simplejson as json
-import dateutil.parser
+
+def parse_date(s):
+  return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.Z")
 
 class JsonHandler(webapp.RequestHandler):
   def get(self, obj_type, arg=''):
@@ -128,13 +130,13 @@ class MainHandler(webapp.RequestHandler):
         if fare and len(fare.strip()) > 0:
           kwds['fare'] = float(fare)
         if paid_by and len(paid_by.strip()) > 0:
-          kwds['paid_by'] = dateutil.parser.parse(paid_by).date()
+          kwds['paid_by'] = parse_date(paid_by).date()
         if state and len(state.strip()) > 0:
           kwds['state'] = state
         if amount_in_credit and len(amount_in_credit.strip()) > 0:
           kwds['amount_in_credit'] = float(amount_in_credit)
         if credit_expiry and len(credit_expiry.strip()) > 0:
-          kwds['credit_expiry'] = dateutil.parser.parse(credit_expiry).date()
+          kwds['credit_expiry'] = parse_date(credit_expiry).date()
 
         if company and booking_ref and course:
           res = views.update_booking(int(obj_id), **kwds)
@@ -150,7 +152,7 @@ class MainHandler(webapp.RequestHandler):
 
         kwds = {}
         if date:
-          kwds['date'] = dateutil.parser.parse(date.strip())
+          kwds['date'] = parse_date(date.strip())
         if from_loc:
           kwds['from_loc'] = from_loc.strip()
         if to_loc:
@@ -202,13 +204,13 @@ class MainHandler(webapp.RequestHandler):
         if fare and len(fare.strip()) > 0:
           kwds['fare'] = float(fare)
         if paid_by and len(paid_by.strip()) > 0:
-          kwds['paid_by'] = dateutil.parser.parse(paid_by).date()
+          kwds['paid_by'] = parse_date(paid_by).date()
         if state and len(state.strip()) > 0:
           kwds['state'] = state
         if amount_in_credit and len(amount_in_credit.strip()) > 0:
           kwds['amount_in_credit'] = float(amount_in_credit)
         if credit_expiry and len(credit_expiry.strip()) > 0:
-          kwds['credit_expiry'] = dateutil.parser.parse(credit_expiry).date()
+          kwds['credit_expiry'] = parse_date(credit_expiry).date()
 
         if company and booking_ref and course:
           res = views.add_booking(company, booking_ref, course, **kwds)
@@ -224,7 +226,7 @@ class MainHandler(webapp.RequestHandler):
 
         kwds = {}
         if date:
-          kwds['date'] = dateutil.parser.parse(date.strip())
+          kwds['date'] = parse_date(date.strip())
         if from_loc:
           kwds['from_loc'] = from_loc.strip()
         if to_loc:
