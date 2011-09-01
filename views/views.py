@@ -126,6 +126,18 @@ def get_passenger_fares_by_sector_id(sector_id):
 
   return res
 
+def get_passenger_by_booking_id(booking_id):
+  b = db.Key.from_path('Booking', booking_id)
+  q = PassengerSectorBooking.all()
+  q.filter('booking = ', b)
+
+  res = {}
+  for psb in q:
+    p = psb.passenger.to_dict()
+    res[p['service_no']] = p
+
+  return res.values()
+
 def get_documents_by_booking_id(booking_id):
   b = db.Key.from_path('Booking', booking_id)
   dd = Document.all()
