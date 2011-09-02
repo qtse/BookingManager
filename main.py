@@ -124,8 +124,7 @@ class MainHandler(webapp.RequestHandler):
       res = views.get_current_courses()
     elif obj_type == 'company':
       # /company
-      # TODO: not yet implemented
-      pass
+      res = views.get_companies()
 
     self.response.out.write(json.dumps(res, default=fmt.json_handler))
 

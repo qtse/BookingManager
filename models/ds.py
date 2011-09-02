@@ -116,6 +116,8 @@ class LastUse(db.Model):
   obj = db.ReferenceProperty(db.Model, required=True, collection_name='last_use')
   last_use = db.DateProperty(default=datetime.now(timezone('Australia/Sydney')).date())
 
+class Company(db.Model):
+  name = db.StringProperty(required=True)
 
 ## TODO
 def delete_stale_records():

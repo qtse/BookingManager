@@ -50,10 +50,16 @@ def get_document_by_id(doc_id):
     return d.to_dict()
 
 # Searches
-def get_bookings(active_only=True):
+def get_bookings(active_only=True, states=['UNPAID', 'PAID', 'CREDIT']):
   res = {}
   now = _current_date()
-  for cat in ['UNPAID', 'PAID', 'CREDIT', 'CANCELLED']:
+
+  if not active_only and isinstance(states, list):
+    states.append('CANCELLED')
+  elif not isinstance(states, list):
+    states = [states]
+
+  for cat in states:
     q = Booking.all()
     q.filter("state = ", cat)
     if active_only:
@@ -151,6 +157,10 @@ def get_current_courses():
 
   return set([b.course for b in q])
 
+def get_companies():
+  q = Company.all()
+
+  return [ c.name for c in q ]
 
 # add functions
 
@@ -171,6 +181,9 @@ def add_booking(company, booking_ref, course, **kwds):
     res.credit_expiry = kwds['credit_expiry']
     if res.last_date < kwds['credit_expiry']:
       res.last_date = kwds['credit_expiry']
+
+  c = Company(key_name=company, company=company)
+  db.put_async(c)
 
   res.put()
   _use(res.key())
