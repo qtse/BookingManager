@@ -273,7 +273,7 @@ def update_booking(booking_id, **kwds):
     b.put()
     _use(b.key())
 
-  return b
+  return b.to_dict()
 
 def update_document(doc_id, **kwds):
   d = Document.get_by_id(doc_id)
@@ -287,7 +287,7 @@ def update_document(doc_id, **kwds):
     d.put()
     _use(d.booking.key())
 
-  return d
+  return d.to_dict()
 
 def update_passenger(service_no, **kwds):
   p = Passenger.get_by_key_name(service_no)
@@ -301,7 +301,7 @@ def update_passenger(service_no, **kwds):
     p.put()
     _use(p.key())
 
-  return p
+  return p.to_dict()
 
 def update_sector(sector_id, **kwds):
   s = Sector.get_by_id(sector_id)
@@ -319,7 +319,7 @@ def update_sector(sector_id, **kwds):
     s.put()
     _use(s.booking.key())
 
-  return s
+  return s.to_dict()
 
 def update_passenger_fare(service_no, sector_id, fare_type):
   s = db.Key.from_path('Sector', sector_id)
