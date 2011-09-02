@@ -50,12 +50,12 @@ class MainHandler(webapp.RequestHandler):
     if obj_type == 'booking':
       # /booking
       if len(args) == 1 and len(args[0].strip()) > 0:
+        get_all = self.request.get('all', default_value='no').strip()
+        active_only = (get_all != 'no')
+
         if args[0] == 'search':
           # /booking/search?
           search_by = self.request.get('search_by', default_value='ref')
-
-          get_all = self.request.get('all', default_value='no').strip()
-          active_only = (get_all != 'no')
 
           if search_by == 'ref':
             # /booking/search?search_by=ref&ref=<ref>[&company=<company>]
@@ -69,6 +69,14 @@ class MainHandler(webapp.RequestHandler):
             course = self.request.get('course', default_value=None)
 
             res = views.get_bookings_by_passenger_sn(sn, course, active_only)
+        elif args[0] == 'unpaid':
+          res = views.get_bookings(active_only, 'UNPAID')['UNPAID']
+        elif args[0] == 'paid':
+          res = views.get_bookings(active_only, 'PAID')['PAID']
+        elif args[0] == 'credit':
+          res = views.get_bookings(active_only, 'CREDIT')['CREDIT']
+        elif args[0] == 'cancelled':
+          res = views.get_bookings(active_only, 'CANCELLED')['CANCELLED']
         else:
           # /booking/<id>
           res = views.get_booking_by_id(int(args[0]))
