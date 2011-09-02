@@ -48,59 +48,87 @@ class MainHandler(webapp.RequestHandler):
     res = None
 
     if obj_type == 'booking':
-      if len(args) == 1:
-        res = views.get_booking_by_id(int(args[0]))
+      # /booking
+      if len(args) == 1 and len(args[0].strip()) > 0:
+        if args[0] == 'search':
+          # /booking/search?
+          search_by = self.request.get('search_by', default_value='ref')
+
+          get_all = self.request.get('all', default_value='no').strip()
+          active_only = (get_all != 'no')
+
+          if search_by == 'ref':
+            # /booking/search?search_by=ref&ref=<ref>[&company=<company>]
+            ref = self.request.get('ref', default_value=None)
+            company = self.request.get('company', default_value=None)
+
+            res = views.get_bookings_by_booking_ref(ref, company, active_only)
+          elif search_by == 'pax':
+            # /booking/search?search_by=pax&service_no=<service_no>[&course=<course>]
+            sn = self.request.get('service_no', default_value=None)
+            course = self.request.get('course', default_value=None)
+
+            res = views.get_bookings_by_passenger_sn(sn, course, active_only)
+        else:
+          # /booking/<id>
+          res = views.get_booking_by_id(int(args[0]))
       elif len(args) > 1:
-        elif args[0] == 'ref':
-          ref = args[1]
-          company = None
-          if len(args) > 3 and args[2] == 'company':
-            company = args[3]
-
-          get_all = self.request.get('all', default_value='no').strip()
-          active_only = (get_all != '')
-
-          res = views.get_bookings_by_booking_ref(ref, company, active_only)
-        elif args[0] == 'pax':
-          sn = args[1]
-          course = None
-          if len(args) > 3 and args[2] == 'course':
-            course = args[3]
-
-          get_all = self.request.get('all', default_value='no').strip()
-          active_only = (get_all != '')
-
-          res = views.get_bookings_by_passenger_sn(sn, course, active_only)
+        if args[1] == 'sector':
+          # /booking/<id>/sector
+          res = views.get_sector_by_booking_id(int(args[0]))
+        elif args[1] == 'pax':
+          # /booking/<id>/pax
+          res = views.get_passenger_by_booking_id(int(args[0]))
+        elif args[1] == 'doc':
+          # /booking/<id>/doc
+          res = views.get_document_by_booking_id(int(args[0]))
       else:
+        # /booking
         get_all = self.request.get('all', default_value='no').strip()
-        active_only = (get_all != '')
+        active_only = (get_all != 'no')
         res = views.get_bookings(active_only)
     elif obj_type == 'sector':
-      if args[0] == 'id':
-        res = views.get_sector_by_id(int(args[1]))
-      elif args[0] == 'pax':
-        res = views.get_sectors_by_passenger_sn(args[1])
-      elif args[0] == 'booking':
-        res = views.get_sectors_by_booking_id(int(args[1]))
+      # /sector
+      if len(args) == 1 and len(args[0].strip()) > 0:
+        # /sector/<id>
+        res = views.get_sector_by_id(int(args[0]))
+      elif len(args) == 2:
+        # /sector/<id>/pax
+        res = view.get_passenger_fares_by_sector_id(int(args[0]))
     elif obj_type == 'pax':
-      if args[0] == 'id':
-        res = views.get_passenger_by_sn(args[1])
-      elif args[0] == 'name':
-        init = None
-        if len(args) > 3 and args[2] == 'init':
-          init = args[3]
-        res = views.get_passengers_by_name(args[1], init)
-      elif args[0] == 'sector':
-        res = views.get_passenger_fares_by_sector_id(int(args[1]))
+      # /pax
+      if len(args) == 1 and args[0] == 'search':
+        # /pax/search?last_name=<last_name>[&init=<init>]
+        last_name = self.request.get('last_name', default_value=None)
+        init = self.request.get('init', default_value=None)
+
+        res = views.get_passengers_by_name(last_name, init)
+      elif len(args) == 1 and len(args[0].strip()) > 0:
+        # /pax/<service_no>
+        res = view.get_passenger_by_sn(args[0])
+      elif len(args) > 1:
+        sn = args[0].strip()
+
+        if args[1] == 'sector':
+          # /pax/<service_no>/sector
+          res = get_sectors_by_passenger_sn(sn)
+        elif args[1] == 'booking':
+          # /pax/<service_no>/booking
+          res = get_bookings_by_passenger_sn(sn)
     elif obj_type == 'doc':
-      if args[0] == 'id':
-        res = views.get_document_by_id(int(args[1]))
-      elif args[0] == 'booking':
-        res = views.get_document_by_booking_id(int(args[1]))
+      # /doc/<id>
+      assert (len(args) == 1 and len(args[0].strip() > 0))
+      res = views.get_document_by_id(int(args[0]))
     elif obj_type == 'course':
+      # /course
       res = views.get_current_courses()
+    elif obj_type == 'company':
+      # /company
+      # TODO: not yet implemented
+      pass
 
     self.response.out.write(json.dumps(res, default=fmt.json_handler))
+
   def put(self, obj_type, arg=''):
     arg = arg.strip()
     if len(arg) > 0 and arg[-1] == '/':
